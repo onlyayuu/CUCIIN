@@ -1,0 +1,89 @@
+{% extends "base_admin.html" %}
+{% set active = 'rekap' %}
+{% block title %}rekap — cuciin admin{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+    <div class="panel-header">
+        <span>Rekap Keuangan</span>
+        <div>
+            <a href="/admin/rekap?periode=hari"  class="btn btn-small {% if rekap.periode == 'hari' %}active{% endif %}">Hari ini</a>
+            <a href="/admin/rekap?periode=minggu" class="btn btn-small {% if rekap.periode == 'minggu' %}active{% endif %}">7 Hari</a>
+            <a href="/admin/rekap?periode=bulan"  class="btn btn-small {% if rekap.periode == 'bulan' %}active{% endif %}">30 Hari</a>
+            <a href="/admin/rekap?periode=semua"  class="btn btn-small {% if rekap.periode == 'semua' %}active{% endif %}">Semua</a>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-label">Total Order</div>
+                <div class="stat-value">{{ rekap.total_order }}</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Total Nilai</div>
+                <div class="stat-value">Rp{{ "{:,}".format(rekap.total_nilai) }}</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Sudah Dibayar</div>
+                <div class="stat-value money">Rp{{ "{:,}".format(rekap.total_dibayar) }}</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Piutang</div>
+                <div class="stat-value debt">Rp{{ "{:,}".format(rekap.total_piutang) }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <span>Detail Transaksi</span>
+    </div>
+    <div class="panel-body">
+        {% if orders %}
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>Tanggal</th>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>Layanan</th>
+                    <th>Harga</th>
+                    <th>Dibayar</th>
+                    <th>Sisa</th>
+                    <th>Status Bayar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in orders %}
+                <tr>
+                    <td>{{ o.created_at[:16] }}</td>
+                    <td>#{{ o.id }}</td>
+                    <td>{{ o.nama }}</td>
+                    <td>{{ o.layanan }}</td>
+                    <td>Rp{{ "{:,}".format(o.harga) }}</td>
+                    <td>Rp{{ "{:,}".format(o.jumlah_bayar) }}</td>
+                    <td>
+                        {% if o.harga - o.jumlah_bayar > 0 %}
+                        <span style="color:#b02a2a;">Rp{{ "{:,}".format(o.harga - o.jumlah_bayar) }}</span>
+                        {% else %}-{% endif %}
+                    </td>
+                    <td>
+                        {% if o.sudah_bayar %}
+                        <span class="badge badge-lunas">Lunas</span>
+                        {% else %}
+                        <span class="badge badge-belum">Belum</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty">Gak ada transaksi di periode ini.</div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

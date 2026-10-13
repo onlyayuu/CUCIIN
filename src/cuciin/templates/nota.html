@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>nota #{{ o.id }} — cuciin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            font-size: 12px;
+            background: #d4d0c8;
+            padding: 20px;
+            color: #1a3a5c;
+        }
+        .nota {
+            max-width: 500px;
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid #7eb8e0;
+            border-radius: 6px;
+            box-shadow: 0 4px 16px rgba(74,127,176,0.3);
+            overflow: hidden;
+        }
+        .nota-header {
+            background: linear-gradient(180deg, #f0f8ff 0%, #b8d8f0 45%, #7eb8e0 50%, #5a9fd4 100%);
+            padding: 16px 20px;
+            text-align: center;
+            border-bottom: 2px solid #4a7fb0;
+        }
+        .nota-header h1 {
+            font-size: 24px;
+            color: #fff;
+            text-shadow: 1px 1px 2px #2a5a8a, 0 0 8px #ffffff80;
+            letter-spacing: 2px;
+        }
+        .nota-header p {
+            font-size: 10px;
+            color: #e8f4fc;
+            margin-top: 2px;
+            text-shadow: 1px 1px 1px #2a5a8a;
+        }
+        .nota-body { padding: 20px; }
+        .nota-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px dashed #d8ecf8;
+            font-size: 12px;
+        }
+        .nota-row:last-child { border-bottom: none; }
+        .nota-row .label { color: #4a7fb0; font-weight: bold; font-size: 11px; }
+        .nota-row .value { color: #1a3a5c; }
+        .nota-total {
+            background: linear-gradient(180deg, #e8f4fc 0%, #c8e0f4 100%);
+            margin: 12px -20px 0;
+            padding: 12px 20px;
+            border-top: 2px solid #7eb8e0;
+            border-bottom: 2px solid #7eb8e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nota-total .label { font-size: 12px; font-weight: bold; color: #1a3a5c; }
+        .nota-total .value { font-size: 20px; font-weight: bold; color: #1a5a2a; text-shadow: 0 1px 0 #ffffffcc; }
+        .nota-status {
+            text-align: center;
+            padding: 12px;
+            margin-top: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            text-shadow: 1px 1px 1px #ffffffcc;
+        }
+        .nota-lunas {
+            background: linear-gradient(180deg, #d8f8d8 0%, #a8e0a8 100%);
+            color: #1a6a2a;
+            border: 2px solid #78c878;
+        }
+        .nota-belum {
+            background: linear-gradient(180deg, #f8d8d8 0%, #e8a8a8 100%);
+            color: #7a1a1a;
+            border: 2px solid #e08888;
+        }
+        .nota-footer {
+            text-align: center;
+            padding: 14px;
+            font-size: 10px;
+            color: #7a9ab8;
+            border-top: 1px solid #d8ecf8;
+            background: #f5faff;
+        }
+        .no-print { text-align: center; margin-top: 16px; }
+        .btn-print {
+            display: inline-block;
+            padding: 10px 24px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #1a3a5c;
+            text-decoration: none;
+            background: linear-gradient(180deg, #ffffff 0%, #d8ecf8 45%, #a8d0ec 50%, #7eb8e0 100%);
+            border: 1px solid #5a9fd4;
+            border-radius: 14px;
+            box-shadow: inset 0 1px 0 #ffffffcc, 0 2px 4px rgba(0,0,0,0.2);
+            cursor: pointer;
+            font-family: inherit;
+        }
+        @media print {
+            body { background: #fff; padding: 0; }
+            .nota { box-shadow: none; border: none; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="nota">
+        <div class="nota-header">
+            <h1>CUCIIN 🧺</h1>
+            <p>sistem manajemen laundry</p>
+        </div>
+        <div class="nota-body">
+            <div class="nota-row">
+                <span class="label">No. Nota</span>
+                <span class="value">#{{ "%05d"|format(o.id) }}</span>
+            </div>
+            <div class="nota-row">
+                <span class="label">Tanggal</span>
+                <span class="value">{{ now.strftime('%d/%m/%Y %H:%M') }}</span>
+            </div>
+            <div class="nota-row">
+                <span class="label">Nama</span>
+                <span class="value">{{ o.nama }}</span>
+            </div>
+            <div class="nota-row">
+                <span class="label">No HP</span>
+                <span class="value">{{ o.no_hp or '-' }}</span>
+            </div>
+            <div class="nota-row">
+                <span class="label">Rak</span>
+                <span class="value">{{ o.no_rak or '-' }}</span>
+            </div>
+            <div class="nota-row">
+                <span class="label">Layanan</span>
+                <span class="value">{{ o.layanan }}</span>
+            </div>
+            <div class="nota-row">
+                <span class="label">Berat</span>
+                <span class="value">{{ o.berat }} kg</span>
+            </div>
+            <div class="nota-row">
+                <span class="label">Status Cucian</span>
+                <span class="value">{{ o.status }}</span>
+            </div>
+
+            <div class="nota-total">
+                <span class="label">TOTAL</span>
+                <span class="value">Rp{{ "{:,}".format(o.harga) }}</span>
+            </div>
+
+            <div class="nota-row" style="margin-top: 12px;">
+                <span class="label">Sudah Bayar</span>
+                <span class="value">Rp{{ "{:,}".format(o.jumlah_bayar) }}</span>
+            </div>
+
+            {% if o.sudah_bayar %}
+                <div class="nota-status nota-lunas">✓ LUNAS</div>
+            {% else %}
+                <div class="nota-status nota-belum">
+                    KEKURANGAN: Rp{{ "{:,}".format(o.harga - o.jumlah_bayar) }}
+                </div>
+            {% endif %}
+        </div>
+        <div class="nota-footer">
+            Terima kasih telah menggunakan layanan kami 🙏<br>
+            Simpan nota ini sebagai bukti pengambilan
+        </div>
+    </div>
+
+    <div class="no-print">
+        <button class="btn-print" onclick="window.print()">🖨 Print / Save PDF</button>
+    </div>
+</body>
+</html>

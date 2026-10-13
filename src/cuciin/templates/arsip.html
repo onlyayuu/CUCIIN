@@ -1,0 +1,59 @@
+{% extends "base_admin.html" %}
+{% set active = 'arsip' %}
+{% block title %}arsip — cuciin admin{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+    <div class="panel-header">
+        <span>Arsip — Pesanan Selesai (sudah diambil)</span>
+    </div>
+    <div class="panel-body">
+        {% if orders %}
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>No HP</th>
+                    <th>Layanan</th>
+                    <th>Berat</th>
+                    <th>Harga</th>
+                    <th>Bayar</th>
+                    <th>Masuk</th>
+                    <th>Diambil</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in orders %}
+                <tr>
+                    <td>#{{ o.id }}</td>
+                    <td><strong>{{ o.nama }}</strong></td>
+                    <td>{{ o.no_hp or '-' }}</td>
+                    <td>{{ o.layanan }}</td>
+                    <td>{{ o.berat }} kg</td>
+                    <td>Rp{{ "{:,}".format(o.harga) }}</td>
+                    <td>
+                        {% if o.sudah_bayar %}
+                        <span class="badge badge-lunas">Lunas</span>
+                        {% else %}
+                        <span class="badge badge-belum">-Rp{{ "{:,}".format(o.harga - o.jumlah_bayar) }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ o.created_at[:16] }}</td>
+                    <td>{{ o.diambil_at[:16] if o.diambil_at else '-' }}</td>
+                    <td>
+                        <a href="/admin/nota/{{ o.id }}" class="btn btn-small" target="_blank">Nota</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty">Belum ada pesanan yang diambil.</div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base_customer.html" %}
+{% block title %}hasil cek — cuciin{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+    <div class="panel-header">
+        Hasil pencarian: "{{ keyword }}" ({{ orders|length }} order)
+    </div>
+    <div class="panel-body">
+        {% if orders %}
+            {% for o in orders %}
+            <div style="background: linear-gradient(180deg, #ffffff 0%, #f5faff 100%);
+                        border: 1px solid #c8e0f4;
+                        border-radius: 6px;
+                        padding: 14px;
+                        margin-bottom: 10px;
+                        box-shadow: inset 0 1px 0 #fff, 0 1px 3px rgba(74,127,176,0.1);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div>
+                        <span style="font-weight: bold; color: #1a3a5c; font-size: 14px;">#{{ "%05d"|format(o.id) }}</span>
+                        <span style="color: #7a9ab8; font-size: 11px; margin-left: 6px;">{{ o.created_at[:16] }}</span>
+                    </div>
+                    <span class="badge badge-{{ o.status }}">{{ o.status }}</span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 11px;">
+                    <div><span style="color: #7a9ab8;">Nama:</span> <strong>{{ o.nama }}</strong></div>
+                    <div><span style="color: #7a9ab8;">Berat:</span> {{ o.berat }} kg</div>
+                    <div><span style="color: #7a9ab8;">Layanan:</span> {{ o.layanan }}</div>
+                    <div>
+                        <span style="color: #7a9ab8;">Rak:</span>
+                        {% if o.no_rak %}<span class="badge badge-rak">{{ o.no_rak }}</span>{% else %}-{% endif %}
+                    </div>
+                    <div><span style="color: #7a9ab8;">Total:</span> <strong>Rp{{ "{:,}".format(o.harga) }}</strong></div>
+                    <div>
+                        <span style="color: #7a9ab8;">Bayar:</span>
+                        {% if o.sudah_bayar %}
+                            <span class="badge badge-lunas">Lunas</span>
+                        {% else %}
+                            <span class="badge badge-belum">-Rp{{ "{:,}".format(o.harga - o.jumlah_bayar) }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div style="margin-top: 12px; display: flex; gap: 8px;">
+                    <a href="/order/{{ o.id }}" class="btn btn-small">Lihat Detail</a>
+                    <a href="/order/{{ o.id }}/nota" class="btn btn-small btn-secondary" target="_blank">Nota</a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty">
+                <div style="font-size: 48px; margin-bottom: 12px;">🔍</div>
+                <p>Gak ada order dengan keyword "{{ keyword }}"</p>
+                <p style="margin-top: 8px; font-size: 11px;">Coba cek no HP atau no nota lagi</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 16px;">
+    <a href="/" class="btn btn-small btn-secondary" style="display: inline-block; width: auto;">← Cek Lagi</a>
+</div>
+
+{% endblock %}

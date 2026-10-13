@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}admin — cuciin{% endblock %}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Tahoma, Verdana, Arial, sans-serif;
+            font-size: 12px;
+            background: #d4d0c8;
+            background-image:
+                linear-gradient(180deg, #e8f4fc 0%, #b8d8ec 40%, #d4d0c8 40%, #d4d0c8 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #1a3a5c;
+        }
+
+        /* ============ HEADER ============ */
+        .header {
+            background: linear-gradient(180deg, #f0f8ff 0%, #b8d8f0 45%, #7eb8e0 50%, #5a9fd4 100%);
+            border-bottom: 2px solid #4a7fb0;
+            padding: 12px 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 2px #2a5a8a, 0 0 8px #ffffff80;
+            letter-spacing: 1px;
+        }
+        .logo span { font-size: 14px; opacity: 0.85; font-weight: normal; }
+
+        .nav { display: flex; gap: 6px; }
+        .nav a {
+            display: inline-block;
+            padding: 7px 16px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #1a3a5c;
+            text-decoration: none;
+            text-shadow: 0 1px 0 #ffffffcc;
+            background: linear-gradient(180deg, #ffffff 0%, #d8ecf8 45%, #a8d0ec 50%, #7eb8e0 100%);
+            border: 1px solid #5a9fd4;
+            border-radius: 14px;
+            box-shadow:
+                inset 0 1px 0 #ffffffcc,
+                inset 0 -2px 4px #4a7fb033,
+                0 1px 2px rgba(0,0,0,0.15);
+            transition: all 0.15s;
+        }
+        .nav a:hover {
+            background: linear-gradient(180deg, #ffffff 0%, #e8f4fc 45%, #c8e0f4 50%, #9ec8e8 100%);
+        }
+        .nav a.active {
+            background: linear-gradient(180deg, #5a9fd4 0%, #4a8fc4 50%, #3a7fb4 100%);
+            color: #fff;
+            text-shadow: 0 -1px 0 #2a5a8a;
+        }
+
+        /* ============ CONTAINER ============ */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        /* ============ PANEL (kotak glossy) ============ */
+        .panel {
+            background: linear-gradient(180deg, #ffffff 0%, #f0f8ff 100%);
+            border: 1px solid #7eb8e0;
+            border-radius: 6px;
+            box-shadow:
+                inset 0 1px 0 #fff,
+                0 2px 8px rgba(74,127,176,0.2);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .panel-header {
+            background: linear-gradient(180deg, #e8f4fc 0%, #b8d8f0 45%, #a0c8e8 50%, #88b8dc 100%);
+            padding: 8px 14px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #1a3a5c;
+            text-shadow: 0 1px 0 #ffffffcc;
+            border-bottom: 1px solid #7eb8e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .panel-body { padding: 14px; }
+
+        /* ============ STATS ============ */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .stat {
+            background: linear-gradient(180deg, #ffffff 0%, #d8ecf8 100%);
+            border: 1px solid #7eb8e0;
+            border-radius: 6px;
+            padding: 14px;
+            text-align: center;
+            box-shadow:
+                inset 0 1px 0 #fff,
+                inset 0 -8px 12px #b8d8f033,
+                0 2px 6px rgba(74,127,176,0.15);
+        }
+        .stat-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #4a7fb0;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1a3a5c;
+            text-shadow: 0 1px 0 #ffffffcc;
+        }
+        .stat-value.money { color: #2a7a3a; }
+        .stat-value.debt { color: #b02a2a; }
+
+        /* ============ BUTTONS ============ */
+        .btn {
+            display: inline-block;
+            padding: 6px 14px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #1a3a5c;
+            text-decoration: none;
+            text-shadow: 0 1px 0 #ffffffcc;
+            background: linear-gradient(180deg, #ffffff 0%, #d8ecf8 45%, #a8d0ec 50%, #7eb8e0 100%);
+            border: 1px solid #5a9fd4;
+            border-radius: 12px;
+            box-shadow:
+                inset 0 1px 0 #ffffffcc,
+                inset 0 -2px 4px #4a7fb033,
+                0 1px 2px rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .btn:hover {
+            background: linear-gradient(180deg, #ffffff 0%, #e8f4fc 45%, #c8e0f4 50%, #9ec8e8 100%);
+        }
+        .btn:active {
+            background: linear-gradient(180deg, #7eb8e0 0%, #5a9fd4 100%);
+            box-shadow: inset 0 2px 4px #2a5a8a66;
+        }
+        .btn-green {
+            background: linear-gradient(180deg, #d8f8d8 0%, #a8e0a8 45%, #78c878 50%, #58a858 100%);
+            border-color: #4a904a;
+            color: #1a4a1a;
+        }
+        .btn-green:hover {
+            background: linear-gradient(180deg, #e8fce8 0%, #b8e8b8 45%, #88d088 50%, #68b068 100%);
+        }
+        .btn-red {
+            background: linear-gradient(180deg, #f8d8d8 0%, #e8a8a8 45%, #d07878 50%, #b05858 100%);
+            border-color: #a04848;
+            color: #4a1a1a;
+        }
+        .btn-red:hover {
+            background: linear-gradient(180deg, #fce8e8 0%, #f0b8b8 45%, #e08888 50%, #c06868 100%);
+        }
+        .btn-small { padding: 4px 10px; font-size: 10px; border-radius: 10px; }
+
+        /* ============ TABLE ============ */
+        table.data {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 11px;
+        }
+        table.data th {
+            background: linear-gradient(180deg, #e8f4fc 0%, #b8d8f0 50%, #a0c8e8 100%);
+            color: #1a3a5c;
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: bold;
+            text-shadow: 0 1px 0 #ffffffcc;
+            border-bottom: 1px solid #7eb8e0;
+            border-right: 1px solid #c8e0f4;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        table.data th:last-child { border-right: none; }
+        table.data td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #d8ecf8;
+            background: #fff;
+        }
+        table.data tr:nth-child(even) td { background: #f5faff; }
+        table.data tr:hover td { background: #e8f4fc; }
+
+        /* ============ BADGES ============ */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            font-size: 10px;
+            font-weight: bold;
+            border-radius: 10px;
+            text-shadow: 0 1px 0 #ffffffcc;
+            border: 1px solid;
+        }
+        .badge-dicuci     { background: #d8e8f8; color: #1a4a7a; border-color: #7eb8e0; }
+        .badge-dikeringin { background: #f8f0d8; color: #7a5a1a; border-color: #e0c878; }
+        .badge-disetrika  { background: #f8d8f0; color: #7a1a5a; border-color: #e088c8; }
+        .badge-ready      { background: #d8f8d8; color: #1a6a2a; border-color: #78c878; }
+        .badge-diambil    { background: #e0e0e0; color: #555;    border-color: #aaa; }
+        .badge-lunas      { background: #d8f8d8; color: #1a6a2a; border-color: #78c878; }
+        .badge-belum      { background: #f8d8d8; color: #7a1a1a; border-color: #e08888; }
+        .badge-rak {
+            background: linear-gradient(180deg, #fff 0%, #e8d8f8 100%);
+            color: #4a1a7a;
+            border-color: #a888d8;
+            font-size: 11px;
+            padding: 4px 12px;
+        }
+
+        /* ============ FLASH MESSAGES ============ */
+        .flash {
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            font-size: 11px;
+            border-radius: 4px;
+            border: 1px solid;
+            box-shadow: inset 0 1px 0 #ffffffcc;
+        }
+        .flash-success { background: #d8f8d8; color: #1a6a2a; border-color: #78c878; }
+        .flash-error   { background: #f8d8d8; color: #7a1a1a; border-color: #e08888; }
+        .flash-warning { background: #f8f0d8; color: #7a5a1a; border-color: #e0c878; }
+
+        /* ============ FORM ============ */
+        .form-row { margin-bottom: 12px; }
+        .form-row label {
+            display: block;
+            font-size: 10px;
+            font-weight: bold;
+            color: #4a7fb0;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            letter-spacing: 0.3px;
+        }
+        .form-row input, .form-row select {
+            width: 100%;
+            padding: 7px 10px;
+            font-size: 12px;
+            font-family: inherit;
+            background: #fff;
+            border: 1px solid #7eb8e0;
+            border-radius: 4px;
+            box-shadow: inset 0 2px 3px #4a7fb022;
+            color: #1a3a5c;
+        }
+        .form-row input:focus, .form-row select:focus {
+            outline: none;
+            border-color: #4a8fc4;
+            box-shadow: inset 0 2px 3px #4a7fb022, 0 0 4px #7eb8e0;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7a9ab8;
+            font-style: italic;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-inner">
+            <div class="logo">cuciin <span>🧺 admin</span></div>
+            <div class="nav">
+                <a href="/admin" class="{% if active == 'dashboard' %}active{% endif %}">Dashboard</a>
+                <a href="/admin/rak" class="{% if active == 'rak' %}active{% endif %}">Rak</a>
+                <a href="/admin/rekap" class="{% if active == 'rekap' %}active{% endif %}">Rekap</a>
+                <a href="/admin/arsip" class="{% if active == 'arsip' %}active{% endif %}">Arsip</a>
+                <a href="/" target="_blank">Lihat Customer</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

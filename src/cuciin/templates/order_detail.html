@@ -1,0 +1,149 @@
+{% extends "base_customer.html" %}
+{% block title %}order #{{ o.id }} — cuciin{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+    <div class="panel-header">
+        Detail Order #{{ "%05d"|format(o.id) }}
+    </div>
+    <div class="panel-body">
+
+        <!-- Timeline -->
+        <div style="margin-bottom: 24px;">
+            <div style="font-size: 11px; font-weight: bold; color: #4a7fb0; text-transform: uppercase; margin-bottom: 16px; letter-spacing: 0.5px;">Progress Cucian</div>
+            <div style="display: flex; justify-content: space-between; position: relative;">
+                {% set steps = ['dicuci', 'dikeringin', 'disetrika', 'ready', 'diambil'] %}
+                {% set current_idx = steps.index(o.status) %}
+
+                {% for step in steps %}
+                    {% set idx = loop.index0 %}
+                    {% set done = idx <= current_idx %}
+                    {% set active = idx == current_idx %}
+                    <div style="flex: 1; text-align: center; position: relative; z-index: 1;">
+                        <div style="width: 40px; height: 40px; margin: 0 auto;
+                                    border-radius: 50%;
+                                    {% if active %}
+                                        background: linear-gradient(180deg, #58a858 0%, #2a7a2a 100%);
+                                        border: 2px solid #1a5a1a;
+                                        box-shadow: 0 0 12px #58a858aa, inset 0 2px 4px #fff6;
+                                    {% elif done %}
+                                        background: linear-gradient(180deg, #a8e0a8 0%, #78c878 100%);
+                                        border: 2px solid #4a904a;
+                                        box-shadow: inset 0 2px 4px #fff8;
+                                    {% else %}
+                                        background: linear-gradient(180deg, #f0f0f0 0%, #d0d0d0 100%);
+                                        border: 2px solid #a0a0a0;
+                                        box-shadow: inset 0 2px 4px #fff8;
+                                    {% endif %}
+                                    display: flex; align-items: center; justify-content: center;
+                                    font-size: 18px; font-weight: bold;
+                                    {% if done %}color: #fff; text-shadow: 1px 1px 2px #2a5a8a;{% else %}color: #999;{% endif %}">
+                            {% if done %}✓{% else %}○{% endif %}
+                        </div>
+                        <div style="font-size: 10px; margin-top: 6px; font-weight: bold;
+                                    {% if active %}color: #1a5a1a;{% elif done %}color: #4a7fb0;{% else %}color: #aaa;{% endif %}">
+                            {{ step }}
+                        </div>
+                    </div>
+                    {% if not loop.last %}
+                    <div style="position: absolute; top: 19px; left: calc({{ (loop.index0 * 20) + 10 }}%); width: 20%; height: 3px;
+                                {% if idx < current_idx %}
+                                    background: linear-gradient(180deg, #78c878 0%, #4a904a 100%);
+                                {% else %}
+                                    background: #d0d0d0;
+                                {% endif %}
+                                z-index: 0;"></div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if o.status == 'ready' %}
+        <div style="background: linear-gradient(180deg, #d8f8d8 0%, #a8e0a8 100%);
+                    border: 2px solid #78c878;
+                    border-radius: 6px;
+                    padding: 14px;
+                    text-align: center;
+                    margin-bottom: 20px;">
+            <div style="font-size: 24px; margin-bottom: 6px;">🎉</div>
+            <div style="font-weight: bold; color: #1a5a1a; font-size: 14px;">Cucianmu udah siap diambil!</div>
+            <div style="font-size: 11px; color: #2a6a2a; margin-top: 4px;">Ambil di rak <strong>{{ o.no_rak }}</strong></div>
+        </div>
+        {% endif %}
+
+        <!-- Detail -->
+        <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
+            <tr style="border-bottom: 1px dashed #d8ecf8;">
+                <td style="padding: 8px 0; color: #4a7fb0; width: 40%;">Nama</td>
+                <td style="padding: 8px 0; font-weight: bold;">{{ o.nama }}</td>
+            </tr>
+            <tr style="border-bottom: 1px dashed #d8ecf8;">
+                <td style="padding: 8px 0; color: #4a7fb0;">No HP</td>
+                <td style="padding: 8px 0;">{{ o.no_hp or '-' }}</td>
+            </tr>
+            <tr style="border-bottom: 1px dashed #d8ecf8;">
+                <td style="padding: 8px 0; color: #4a7fb0;">Layanan</td>
+                <td style="padding: 8px 0;">{{ o.layanan }}</td>
+            </tr>
+            <tr style="border-bottom: 1px dashed #d8ecf8;">
+                <td style="padding: 8px 0; color: #4a7fb0;">Berat</td>
+                <td style="padding: 8px 0;">{{ o.berat }} kg</td>
+            </tr>
+            <tr style="border-bottom: 1px dashed #d8ecf8;">
+                <td style="padding: 8px 0; color: #4a7fb0;">Rak</td>
+                <td style="padding: 8px 0;">
+                    {% if o.no_rak %}<span class="badge badge-rak">{{ o.no_rak }}</span>{% else %}-{% endif %}
+                </td>
+            </tr>
+            <tr style="border-bottom: 1px dashed #d8ecf8;">
+                <td style="padding: 8px 0; color: #4a7fb0;">Tanggal Masuk</td>
+                <td style="padding: 8px 0;">{{ o.created_at[:16] }}</td>
+            </tr>
+            {% if o.diambil_at %}
+            <tr style="border-bottom: 1px dashed #d8ecf8;">
+                <td style="padding: 8px 0; color: #4a7fb0;">Tanggal Diambil</td>
+                <td style="padding: 8px 0;">{{ o.diambil_at[:16] }}</td>
+            </tr>
+            {% endif %}
+        </table>
+
+        <!-- Pembayaran -->
+        <div style="background: linear-gradient(180deg, #f0f8ff 0%, #e0f0fa 100%);
+                    border: 1px solid #c8e0f4;
+                    border-radius: 6px;
+                    padding: 14px;
+                    margin-top: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="color: #4a7fb0; font-size: 11px;">Total</span>
+                <strong style="font-size: 16px;">Rp{{ "{:,}".format(o.harga) }}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="color: #4a7fb0; font-size: 11px;">Sudah Bayar</span>
+                <span>Rp{{ "{:,}".format(o.jumlah_bayar) }}</span>
+            </div>
+            {% if o.sudah_bayar %}
+                <div style="text-align: center; padding: 10px; margin-top: 8px;
+                            background: linear-gradient(180deg, #d8f8d8 0%, #a8e0a8 100%);
+                            border: 2px solid #78c878; border-radius: 6px;
+                            color: #1a6a2a; font-weight: bold; font-size: 14px;">
+                    ✓ LUNAS
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 10px; margin-top: 8px;
+                            background: linear-gradient(180deg, #f8d8d8 0%, #e8a8a8 100%);
+                            border: 2px solid #e08888; border-radius: 6px;
+                            color: #7a1a1a; font-weight: bold; font-size: 14px;">
+                    KEKURANGAN: Rp{{ "{:,}".format(o.harga - o.jumlah_bayar) }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="margin-top: 20px; display: flex; gap: 8px; justify-content: center;">
+            <a href="/order/{{ o.id }}/nota" class="btn btn-small" target="_blank">🖨 Lihat Nota</a>
+            <a href="/" class="btn btn-small btn-secondary">← Cek Lagi</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

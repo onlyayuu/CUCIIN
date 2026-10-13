@@ -1,0 +1,90 @@
+{% extends "base_admin.html" %}
+{% set active = 'dashboard' %}
+{% block title %}dashboard — cuciin admin{% endblock %}
+
+{% block content %}
+
+<div class="stats">
+    <div class="stat">
+        <div class="stat-label">Order Aktif</div>
+        <div class="stat-value">{{ stats.total_order }}</div>
+    </div>
+    <div class="stat">
+        <div class="stat-label">Pendapatan</div>
+        <div class="stat-value money">Rp{{ "{:,}".format(stats.pendapatan) }}</div>
+    </div>
+    <div class="stat">
+        <div class="stat-label">Piutang</div>
+        <div class="stat-value debt">Rp{{ "{:,}".format(stats.piutang) }}</div>
+    </div>
+    <div class="stat">
+        <div class="stat-label">Rak Terpakai</div>
+        <div class="stat-value">{{ stats.rak_terpakai }} / {{ stats.rak_total }}</div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <span>Daftar Pesanan Aktif</span>
+        <a href="/tambah" class="btn btn-small" target="_blank">+ Tambah</a>
+    </div>
+    <div class="panel-body">
+        {% if orders %}
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>No HP</th>
+                    <th>Berat</th>
+                    <th>Layanan</th>
+                    <th>Harga</th>
+                    <th>Rak</th>
+                    <th>Status</th>
+                    <th>Bayar</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in orders %}
+                <tr>
+                    <td>#{{ o.id }}</td>
+                    <td><strong>{{ o.nama }}</strong></td>
+                    <td>{{ o.no_hp or '-' }}</td>
+                    <td>{{ o.berat }} kg</td>
+                    <td>{{ o.layanan }}</td>
+                    <td>Rp{{ "{:,}".format(o.harga) }}</td>
+                    <td>
+                        {% if o.no_rak %}<span class="badge badge-rak">{{ o.no_rak }}</span>{% else %}-{% endif %}
+                    </td>
+                    <td><span class="badge badge-{{ o.status }}">{{ o.status }}</span></td>
+                    <td>
+                        {% if o.sudah_bayar %}
+                            <span class="badge badge-lunas">Lunas</span>
+                        {% else %}
+                            <span class="badge badge-belum">-Rp{{ "{:,}".format(o.harga - o.jumlah_bayar) }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if o.status != 'ready' %}
+                        <a href="/admin/status/{{ o.id }}" class="btn btn-small">Maju →</a>
+                        {% endif %}
+                        <a href="/admin/nota/{{ o.id }}" class="btn btn-small" target="_blank">Nota</a>
+                        {% if o.status == 'ready' %}
+                        <a href="/admin/status/{{ o.id }}" class="btn btn-small btn-green" onclick="return confirm('Konfirmasi pesanan diambil? Rak akan dikosongkan.')">Ambil ✓</a>
+                        {% endif %}
+                        {% if not o.sudah_bayar %}
+                        <a href="/admin/lunas/{{ o.id }}" class="btn btn-small btn-green" onclick="return confirm('Tandai lunas?')">Lunas</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty">Belum ada pesanan aktif.</div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

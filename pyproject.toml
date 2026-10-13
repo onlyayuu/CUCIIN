@@ -1,0 +1,19 @@
+[project]
+name = "cuciin"
+version = "0.1.0"
+description = "Sistem manajemen laundry sederhana"
+requires-python = ">=3.10"
+dependencies = [
+    "rich",
+]
+
+[project.scripts]
+cuciin = "cuciin.cli:main"
+cuciin-web = "cuciin.web:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

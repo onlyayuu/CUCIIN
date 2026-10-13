@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}cuciin{% endblock %}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Tahoma, Verdana, Arial, sans-serif;
+            font-size: 13px;
+            background: #d4d0c8;
+            background-image: linear-gradient(180deg, #e8f4fc 0%, #b8d8ec 40%, #d4d0c8 40%, #d4d0c8 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #1a3a5c;
+        }
+        .header {
+            background: linear-gradient(180deg, #f0f8ff 0%, #b8d8f0 45%, #7eb8e0 50%, #5a9fd4 100%);
+            border-bottom: 2px solid #4a7fb0;
+            padding: 12px 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .header-inner {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 2px #2a5a8a, 0 0 8px #ffffff80;
+            letter-spacing: 1px;
+            text-decoration: none;
+        }
+        .nav a {
+            display: inline-block;
+            padding: 6px 14px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #1a3a5c;
+            text-decoration: none;
+            text-shadow: 0 1px 0 #ffffffcc;
+            background: linear-gradient(180deg, #ffffff 0%, #d8ecf8 45%, #a8d0ec 50%, #7eb8e0 100%);
+            border: 1px solid #5a9fd4;
+            border-radius: 12px;
+            box-shadow: inset 0 1px 0 #ffffffcc, 0 1px 2px rgba(0,0,0,0.15);
+            margin-left: 6px;
+        }
+        .nav a:hover {
+            background: linear-gradient(180deg, #ffffff 0%, #e8f4fc 45%, #c8e0f4 50%, #9ec8e8 100%);
+        }
+        .container {
+            max-width: 700px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .panel {
+            background: linear-gradient(180deg, #ffffff 0%, #f0f8ff 100%);
+            border: 1px solid #7eb8e0;
+            border-radius: 8px;
+            box-shadow: inset 0 1px 0 #fff, 0 4px 16px rgba(74,127,176,0.25);
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .panel-header {
+            background: linear-gradient(180deg, #e8f4fc 0%, #b8d8f0 45%, #a0c8e8 50%, #88b8dc 100%);
+            padding: 10px 16px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #1a3a5c;
+            text-shadow: 0 1px 0 #ffffffcc;
+            border-bottom: 1px solid #7eb8e0;
+        }
+        .panel-body { padding: 20px; }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #1a3a5c;
+            text-decoration: none;
+            text-align: center;
+            text-shadow: 0 1px 0 #ffffffcc;
+            background: linear-gradient(180deg, #ffffff 0%, #d8ecf8 45%, #a8d0ec 50%, #7eb8e0 100%);
+            border: 1px solid #5a9fd4;
+            border-radius: 14px;
+            box-shadow: inset 0 1px 0 #ffffffcc, 0 2px 4px rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .btn:hover {
+            background: linear-gradient(180deg, #ffffff 0%, #e8f4fc 45%, #c8e0f4 50%, #9ec8e8 100%);
+        }
+        .btn:active {
+            background: linear-gradient(180deg, #7eb8e0 0%, #5a9fd4 100%);
+            box-shadow: inset 0 2px 4px #2a5a8a66;
+        }
+        .btn-green {
+            background: linear-gradient(180deg, #d8f8d8 0%, #a8e0a8 45%, #78c878 50%, #58a858 100%);
+            border-color: #4a904a;
+            color: #1a4a1a;
+        }
+        .btn-secondary {
+            background: linear-gradient(180deg, #ffffff 0%, #f0f0f0 45%, #e0e0e0 50%, #d0d0d0 100%);
+            border-color: #a0a0a0;
+            color: #444;
+        }
+        .btn-small { padding: 6px 14px; font-size: 11px; border-radius: 12px; }
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            font-size: 10px;
+            font-weight: bold;
+            border-radius: 10px;
+            text-shadow: 0 1px 0 #ffffffcc;
+            border: 1px solid;
+        }
+        .badge-dicuci     { background: #d8e8f8; color: #1a4a7a; border-color: #7eb8e0; }
+        .badge-dikeringin { background: #f8f0d8; color: #7a5a1a; border-color: #e0c878; }
+        .badge-disetrika  { background: #f8d8f0; color: #7a1a5a; border-color: #e088c8; }
+        .badge-ready      { background: #d8f8d8; color: #1a6a2a; border-color: #78c878; }
+        .badge-diambil    { background: #e0e0e0; color: #555;    border-color: #aaa; }
+        .badge-lunas      { background: #d8f8d8; color: #1a6a2a; border-color: #78c878; }
+        .badge-belum      { background: #f8d8d8; color: #7a1a1a; border-color: #e08888; }
+        .badge-rak {
+            background: linear-gradient(180deg, #fff 0%, #e8d8f8 100%);
+            color: #4a1a7a; border-color: #a888d8;
+            font-size: 11px; padding: 4px 12px;
+        }
+        .flash {
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            font-size: 11px;
+            border-radius: 6px;
+            border: 1px solid;
+            box-shadow: inset 0 1px 0 #ffffffcc;
+        }
+        .flash-success { background: #d8f8d8; color: #1a6a2a; border-color: #78c878; }
+        .flash-error   { background: #f8d8d8; color: #7a1a1a; border-color: #e08888; }
+        .flash-warning { background: #f8f0d8; color: #7a5a1a; border-color: #e0c878; }
+        .empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7a9ab8;
+            font-style: italic;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 10px;
+            color: #7a9ab8;
+        }
+        .footer a { color: #4a7fb0; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-inner">
+            <a href="/" class="logo">cuciin 🧺</a>
+            <div class="nav">
+                <a href="/">Cek Status</a>
+                <a href="/tambah">Order Baru</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <div class="footer">
+        <p>cuciin v0.1.0 — <a href="/admin">admin area →</a></p>
+    </div>
+</body>
+</html>

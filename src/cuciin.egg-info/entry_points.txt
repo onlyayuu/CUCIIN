@@ -1,0 +1,3 @@
+[console_scripts]
+cuciin = cuciin.cli:main
+cuciin-web = cuciin.web:main
