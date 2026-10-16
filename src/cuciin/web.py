@@ -1,12 +1,22 @@
 """Web interface untuk cuciin pakai Flask."""
 
-from flask import Flask, render_template, request, redirect, url_for, flash
-from cuciin.database import get_connection, init_db
+from flask import Flask, render_template, request, redirect, session, url_for, flash
+from cuciin.database import get_connection, init_db, verify_admin
 from cuciin.models import Order, HARGA, STATUS_FLOW, rak_kosong, semua_rak
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.secret_key = "cuciin-secret"
+
+
+@app.before_request
+def require_admin_login():
+    if (
+        request.path.startswith("/admin")
+        and request.endpoint != "admin_login"
+        and not session.get("is_admin")
+    ):
+        return redirect(url_for("admin_login"))
 
 
 # ============ CUSTOMER ============
@@ -316,3 +326,21 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+    if session.get("is_admin"):
+        return redirect(url_for("admin"))
+
+    if request.method == "POST":
+        username = request.form.get("username", "")
+        password = request.form.get("password", "")
+
+        if verify_admin(username, password):
+            session["is_admin"] = True
+            flash("Login berhasil", "success")
+            return redirect(url_for("admin"))
+        else:
+            flash("Username atau password salah", "error")
+
+    return render_template("login.html")
