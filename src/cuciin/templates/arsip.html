@@ -6,7 +6,7 @@
 
 <div class="panel">
     <div class="panel-header">
-        <span>Arsip — Pesanan Selesai (sudah diambil)</span>
+        <span>Arsip — Pesanan Selesai</span>
     </div>
     <div class="panel-body">
         {% if orders %}
@@ -21,29 +21,29 @@
                     <th>Harga</th>
                     <th>Bayar</th>
                     <th>Masuk</th>
-                    <th>Diambil</th>
+                    <th>Selesai</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 {% for o in orders %}
                 <tr>
-                    <td>#{{ o.id }}</td>
-                    <td><strong>{{ o.nama }}</strong></td>
-                    <td>{{ o.no_hp or '-' }}</td>
-                    <td>{{ o.layanan }}</td>
-                    <td>{{ o.berat }} kg</td>
-                    <td>Rp{{ "{:,}".format(o.harga) }}</td>
-                    <td>
+                    <td data-label="ID">#{{ o.id }}</td>
+                    <td data-label="Nama"><strong>{{ o.nama }}</strong></td>
+                    <td data-label="No WhatsApp">{{ o.no_hp or '-' }}</td>
+                    <td data-label="Layanan">{{ o.layanan }}</td>
+                    <td data-label="Berat">{{ o.berat }} kg</td>
+                    <td data-label="Harga">Rp{{ "{:,}".format(o.harga) }}</td>
+                    <td data-label="Bayar">
                         {% if o.sudah_bayar %}
                         <span class="badge badge-lunas">Lunas</span>
                         {% else %}
                         <span class="badge badge-belum">-Rp{{ "{:,}".format(o.harga - o.jumlah_bayar) }}</span>
                         {% endif %}
                     </td>
-                    <td>{{ o.created_at[:16] }}</td>
-                    <td>{{ o.diambil_at[:16] if o.diambil_at else '-' }}</td>
-                    <td>
+                    <td data-label="Masuk">{{ o.created_at[:16] }}</td>
+                    <td data-label="Selesai">{{ o.updated_at[:16] }}</td>
+                    <td data-label="Aksi">
                         <a href="/admin/nota/{{ o.id }}" class="btn btn-small" target="_blank">Nota</a>
                     </td>
                 </tr>
@@ -51,7 +51,7 @@
             </tbody>
         </table>
         {% else %}
-        <div class="empty">Belum ada pesanan yang diambil.</div>
+        <div class="empty">Belum ada pesanan yang selesai.</div>
         {% endif %}
     </div>
 </div>

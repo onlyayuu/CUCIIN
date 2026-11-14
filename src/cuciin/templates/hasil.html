@@ -21,7 +21,7 @@
                         <span style="font-weight: bold; color: #1a3a5c; font-size: 14px;">#{{ "%05d"|format(o.id) }}</span>
                         <span style="color: #7a9ab8; font-size: 11px; margin-left: 6px;">{{ o.created_at[:16] }}</span>
                     </div>
-                    <span class="badge badge-{{ o.status }}">{{ o.status }}</span>
+                    <span class="badge badge-{{ o.status }}">{{ o.status|capitalize }}</span>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 11px;">
                     <div><span style="color: #7a9ab8;">Nama:</span> <strong>{{ o.nama }}</strong></div>

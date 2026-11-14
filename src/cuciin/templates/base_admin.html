@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}admin — cuciin{% endblock %}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,7 +41,7 @@
         }
         .logo span { font-size: 14px; opacity: 0.85; font-weight: normal; }
 
-        .nav { display: flex; gap: 6px; }
+        .nav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
         .nav a {
             display: inline-block;
             padding: 7px 16px;
@@ -217,11 +218,8 @@
             text-shadow: 0 1px 0 #ffffffcc;
             border: 1px solid;
         }
-        .badge-dicuci     { background: #d8e8f8; color: #1a4a7a; border-color: #7eb8e0; }
-        .badge-dikeringin { background: #f8f0d8; color: #7a5a1a; border-color: #e0c878; }
-        .badge-disetrika  { background: #f8d8f0; color: #7a1a5a; border-color: #e088c8; }
-        .badge-ready      { background: #d8f8d8; color: #1a6a2a; border-color: #78c878; }
-        .badge-diambil    { background: #e0e0e0; color: #555;    border-color: #aaa; }
+        .badge-diproses   { background: #f8f0d8; color: #7a5a1a; border-color: #e0c878; }
+        .badge-selesai    { background: #d8f8d8; color: #1a6a2a; border-color: #78c878; }
         .badge-lunas      { background: #d8f8d8; color: #1a6a2a; border-color: #78c878; }
         .badge-belum      { background: #f8d8d8; color: #7a1a1a; border-color: #e08888; }
         .badge-rak {
@@ -267,6 +265,14 @@
             box-shadow: inset 0 2px 3px #4a7fb022;
             color: #1a3a5c;
         }
+        .order-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            align-items: end;
+        }
+        .order-form .form-row { margin-bottom: 0; }
+        .order-form button { margin-bottom: 0; }
         .form-row input:focus, .form-row select:focus {
             outline: none;
             border-color: #4a8fc4;
@@ -280,6 +286,129 @@
             font-style: italic;
             font-size: 12px;
         }
+        .search-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .search-form input {
+            flex: 1;
+            min-width: 0;
+            padding: 8px 10px;
+            border: 1px solid #7eb8e0;
+            border-radius: 4px;
+            font: inherit;
+        }
+        .table-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .order-list { display: grid; gap: 8px; }
+        .order-card {
+            overflow: hidden;
+            border: 1px solid #c8e0f4;
+            border-radius: 6px;
+            background: #fff;
+        }
+        .order-card summary {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            cursor: pointer;
+            list-style: none;
+        }
+        .order-card summary::-webkit-details-marker { display: none; }
+        .order-card summary:hover { background: #f5faff; }
+        .order-name {
+            flex: 1;
+            min-width: 0;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+        .order-toggle {
+            flex: 0 0 auto;
+            color: #4a7fb0;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        .order-toggle::after { content: "Detail +"; }
+        .order-card[open] .order-toggle::after { content: "Tutup −"; }
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            padding: 12px;
+            border-top: 1px solid #d8ecf8;
+        }
+        .order-field { min-width: 0; overflow-wrap: anywhere; }
+        .order-field-label {
+            display: block;
+            margin-bottom: 3px;
+            color: #4a7fb0;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .order-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding-top: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .header { padding: 10px; }
+            .header-inner { flex-direction: column; gap: 10px; }
+            .nav { justify-content: center; }
+            .nav a { padding: 7px 10px; }
+            .container { width: 100%; margin: 12px auto; padding: 0 10px; }
+            .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+            .stat { min-width: 0; padding: 10px 6px; }
+            .stat-value { font-size: 16px; overflow-wrap: anywhere; }
+            .panel-header { align-items: flex-start; gap: 8px; }
+            .panel-body { padding: 10px; }
+            .order-form { grid-template-columns: minmax(0, 1fr); }
+            .order-form .btn { width: 100%; padding: 10px; }
+            .search-form { flex-wrap: wrap; }
+            .search-form input { flex-basis: 100%; }
+            .order-details { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+            .order-actions { grid-column: auto; }
+            table.data { display: block; width: 100%; }
+            table.data thead { display: none; }
+            table.data tbody { display: grid; gap: 10px; }
+            table.data tr {
+                display: block;
+                overflow: hidden;
+                border: 1px solid #c8e0f4;
+                border-radius: 6px;
+            }
+            table.data td {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 10px;
+                width: 100%;
+                padding: 8px;
+                text-align: right;
+                overflow-wrap: anywhere;
+            }
+            table.data td::before {
+                content: attr(data-label);
+                flex: 0 0 34%;
+                color: #4a7fb0;
+                font-weight: bold;
+                text-align: left;
+            }
+            table.data .table-actions { justify-content: flex-end; }
+            table.data .table-actions .btn { text-align: center; }
+        }
+        @media (max-width: 380px) {
+            .stats { grid-template-columns: minmax(0, 1fr); }
+            .panel-header { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
@@ -291,7 +420,6 @@
                 <a href="/admin/rak" class="{% if active == 'rak' %}active{% endif %}">Rak</a>
                 <a href="/admin/rekap" class="{% if active == 'rekap' %}active{% endif %}">Rekap</a>
                 <a href="/admin/arsip" class="{% if active == 'arsip' %}active{% endif %}">Arsip</a>
-                <a href="/" target="_blank">Lihat Customer</a>
             </div>
         </div>
     </div>

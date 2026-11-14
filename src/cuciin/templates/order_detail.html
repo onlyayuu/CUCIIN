@@ -9,57 +9,18 @@
     </div>
     <div class="panel-body">
 
-        <!-- Timeline -->
         <div style="margin-bottom: 24px;">
             <div style="font-size: 11px; font-weight: bold; color: #4a7fb0; text-transform: uppercase; margin-bottom: 16px; letter-spacing: 0.5px;">Progress Cucian</div>
-            <div style="display: flex; justify-content: space-between; position: relative;">
-                {% set steps = ['dicuci', 'dikeringin', 'disetrika', 'ready', 'diambil'] %}
-                {% set current_idx = steps.index(o.status) %}
-
-                {% for step in steps %}
-                    {% set idx = loop.index0 %}
-                    {% set done = idx <= current_idx %}
-                    {% set active = idx == current_idx %}
-                    <div style="flex: 1; text-align: center; position: relative; z-index: 1;">
-                        <div style="width: 40px; height: 40px; margin: 0 auto;
-                                    border-radius: 50%;
-                                    {% if active %}
-                                        background: linear-gradient(180deg, #58a858 0%, #2a7a2a 100%);
-                                        border: 2px solid #1a5a1a;
-                                        box-shadow: 0 0 12px #58a858aa, inset 0 2px 4px #fff6;
-                                    {% elif done %}
-                                        background: linear-gradient(180deg, #a8e0a8 0%, #78c878 100%);
-                                        border: 2px solid #4a904a;
-                                        box-shadow: inset 0 2px 4px #fff8;
-                                    {% else %}
-                                        background: linear-gradient(180deg, #f0f0f0 0%, #d0d0d0 100%);
-                                        border: 2px solid #a0a0a0;
-                                        box-shadow: inset 0 2px 4px #fff8;
-                                    {% endif %}
-                                    display: flex; align-items: center; justify-content: center;
-                                    font-size: 18px; font-weight: bold;
-                                    {% if done %}color: #fff; text-shadow: 1px 1px 2px #2a5a8a;{% else %}color: #999;{% endif %}">
-                            {% if done %}✓{% else %}○{% endif %}
-                        </div>
-                        <div style="font-size: 10px; margin-top: 6px; font-weight: bold;
-                                    {% if active %}color: #1a5a1a;{% elif done %}color: #4a7fb0;{% else %}color: #aaa;{% endif %}">
-                            {{ step }}
-                        </div>
-                    </div>
-                    {% if not loop.last %}
-                    <div style="position: absolute; top: 19px; left: calc({{ (loop.index0 * 20) + 10 }}%); width: 20%; height: 3px;
-                                {% if idx < current_idx %}
-                                    background: linear-gradient(180deg, #78c878 0%, #4a904a 100%);
-                                {% else %}
-                                    background: #d0d0d0;
-                                {% endif %}
-                                z-index: 0;"></div>
-                    {% endif %}
+            <div style="display: flex; justify-content: center; gap: 12px;">
+                {% for step in ['diproses', 'selesai'] %}
+                <span class="badge badge-{{ step }}" style="padding: 8px 18px; opacity: {% if o.status == step or (step == 'diproses' and o.status == 'selesai') %}1{% else %}.45{% endif %};">
+                    {{ step|capitalize }}
+                </span>
                 {% endfor %}
             </div>
         </div>
 
-        {% if o.status == 'ready' %}
+        {% if o.status == 'selesai' %}
         <div style="background: linear-gradient(180deg, #d8f8d8 0%, #a8e0a8 100%);
                     border: 2px solid #78c878;
                     border-radius: 6px;
@@ -67,8 +28,7 @@
                     text-align: center;
                     margin-bottom: 20px;">
             <div style="font-size: 24px; margin-bottom: 6px;">🎉</div>
-            <div style="font-weight: bold; color: #1a5a1a; font-size: 14px;">Cucianmu udah siap diambil!</div>
-            <div style="font-size: 11px; color: #2a6a2a; margin-top: 4px;">Ambil di rak <strong>{{ o.no_rak }}</strong></div>
+            <div style="font-weight: bold; color: #1a5a1a; font-size: 14px;">Pesananmu sudah selesai!</div>
         </div>
         {% endif %}
 
@@ -100,12 +60,6 @@
                 <td style="padding: 8px 0; color: #4a7fb0;">Tanggal Masuk</td>
                 <td style="padding: 8px 0;">{{ o.created_at[:16] }}</td>
             </tr>
-            {% if o.diambil_at %}
-            <tr style="border-bottom: 1px dashed #d8ecf8;">
-                <td style="padding: 8px 0; color: #4a7fb0;">Tanggal Diambil</td>
-                <td style="padding: 8px 0;">{{ o.diambil_at[:16] }}</td>
-            </tr>
-            {% endif %}
         </table>
 
         <!-- Pembayaran -->

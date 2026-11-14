@@ -10,7 +10,7 @@ HARGA = {
 }
 
 # Urutan status
-STATUS_FLOW = ["dicuci", "dikeringin", "disetrika", "ready", "diambil"]
+STATUS_FLOW = ["diproses", "selesai"]
 
 # Kapasitas rak
 MAX_RAK = 20
@@ -24,7 +24,7 @@ def semua_rak() -> list[str]:
 def rak_kosong(conn) -> str | None:
     """Cari rak kosong pertama."""
     rows = conn.execute(
-        "SELECT no_rak FROM orders WHERE status != 'diambil' AND no_rak IS NOT NULL"
+        "SELECT no_rak FROM orders WHERE status != 'selesai' AND no_rak IS NOT NULL"
     ).fetchall()
     kepake = {r["no_rak"] for r in rows}
 
@@ -42,7 +42,7 @@ class Order:
     berat: float
     layanan: str
     harga: int
-    status: str = "dicuci"
+    status: str = "diproses"
     no_rak: str | None = None
     sudah_bayar: int = 0
     jumlah_bayar: int = 0
@@ -65,7 +65,7 @@ class Order:
             berat=berat,
             layanan=layanan,
             harga=harga,
-            status="dicuci",
+            status="diproses",
         )
 
     def kekurangan(self) -> int:

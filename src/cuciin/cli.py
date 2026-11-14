@@ -112,16 +112,15 @@ def status(args):
     idx = STATUS_FLOW.index(current)
 
     if idx + 1 >= len(STATUS_FLOW):
-        console.print(f"[yellow]order #{order_id} udah diambil, gak bisa maju lagi[/yellow]")
+        console.print(f"[yellow]order #{order_id} sudah selesai, tidak bisa diubah lagi[/yellow]")
         conn.close()
         return
 
     next_stat = STATUS_FLOW[idx + 1]
 
-    # Kalau maju ke 'diambil', set diambil_at & kosongin rak
-    if next_stat == "diambil":
+    if next_stat == "selesai":
         conn.execute(
-            "UPDATE orders SET status = ?, diambil_at = CURRENT_TIMESTAMP, no_rak = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+            "UPDATE orders SET status = ?, no_rak = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
             (next_stat, order_id),
         )
         console.print(f"[green]✓[/green] order #{order_id}: {current} → {next_stat} (rak {row['no_rak']} kosong)")
@@ -201,7 +200,7 @@ def rak(args):
     """cuciin rak — lihat status rak"""
     conn = get_connection()
     rows = conn.execute(
-        "SELECT no_rak, nama FROM orders WHERE status != 'diambil' AND no_rak IS NOT NULL"
+        "SELECT no_rak, nama FROM orders WHERE status != 'selesai' AND no_rak IS NOT NULL"
     ).fetchall()
     conn.close()
 
@@ -241,8 +240,8 @@ def help_cmd(args=None):
   cuci-setrika    Rp10.000/kg
   express         Rp15.000/kg
 
-[bold]Status flow:[/bold]
-  dicuci → dikeringin → disetrika → ready → diambil
+[bold]Status:[/bold]
+  diproses → selesai
 """)
 
 

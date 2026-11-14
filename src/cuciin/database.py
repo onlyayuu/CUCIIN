@@ -55,7 +55,7 @@ def init_db():
                 berat REAL NOT NULL,
                 layanan TEXT NOT NULL,
                 harga INTEGER NOT NULL,
-                status TEXT NOT NULL DEFAULT 'dicuci',
+                status TEXT NOT NULL DEFAULT 'diproses',
                 no_rak TEXT,
                 sudah_bayar INTEGER DEFAULT 0,
                 jumlah_bayar INTEGER DEFAULT 0,
@@ -71,6 +71,14 @@ def init_db():
                 password_hash TEXT NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
+        """)
+        cursor.execute("""
+            UPDATE orders
+            SET status = CASE
+                WHEN status = 'diambil' THEN 'selesai'
+                ELSE 'diproses'
+            END
+            WHERE status NOT IN ('diproses', 'selesai')
         """)
 
         admin_exists = cursor.execute(

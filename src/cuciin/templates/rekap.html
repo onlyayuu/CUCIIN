@@ -15,6 +15,7 @@
         </div>
     </div>
     <div class="panel-body">
+        <p style="margin-bottom: 12px; color: #4a7fb0;">Hanya pesanan berstatus Selesai dan pembayaran Lunas yang ditampilkan.</p>
         <div class="stats">
             <div class="stat">
                 <div class="stat-label">Total Order</div>
@@ -58,18 +59,18 @@
             <tbody>
                 {% for o in orders %}
                 <tr>
-                    <td>{{ o.created_at[:16] }}</td>
-                    <td>#{{ o.id }}</td>
-                    <td>{{ o.nama }}</td>
-                    <td>{{ o.layanan }}</td>
-                    <td>Rp{{ "{:,}".format(o.harga) }}</td>
-                    <td>Rp{{ "{:,}".format(o.jumlah_bayar) }}</td>
-                    <td>
+                    <td data-label="Tanggal">{{ o.created_at[:16] }}</td>
+                    <td data-label="ID">#{{ o.id }}</td>
+                    <td data-label="Nama">{{ o.nama }}</td>
+                    <td data-label="Layanan">{{ o.layanan }}</td>
+                    <td data-label="Harga">Rp{{ "{:,}".format(o.harga) }}</td>
+                    <td data-label="Dibayar">Rp{{ "{:,}".format(o.jumlah_bayar) }}</td>
+                    <td data-label="Sisa">
                         {% if o.harga - o.jumlah_bayar > 0 %}
                         <span style="color:#b02a2a;">Rp{{ "{:,}".format(o.harga - o.jumlah_bayar) }}</span>
                         {% else %}-{% endif %}
                     </td>
-                    <td>
+                    <td data-label="Status Bayar">
                         {% if o.sudah_bayar %}
                         <span class="badge badge-lunas">Lunas</span>
                         {% else %}

@@ -25,64 +25,104 @@
 
 <div class="panel">
     <div class="panel-header">
-        <span>Daftar Pesanan Aktif</span>
-        <a href="/tambah" class="btn btn-small" target="_blank">+ Tambah</a>
+        <span>Tambah Pesanan</span>
     </div>
     <div class="panel-body">
+        <form method="POST" action="/admin" class="order-form">
+            <div class="form-row">
+                <label for="nama">Nama pelanggan</label>
+                <input id="nama" type="text" name="nama" required>
+            </div>
+            <div class="form-row">
+                <label for="no_hp">No HP (opsional)</label>
+                <input id="no_hp" type="text" name="no_hp">
+            </div>
+            <div class="form-row">
+                <label for="berat">Berat (kg)</label>
+                <input id="berat" type="number" name="berat" step="0.1" min="0.1" required>
+            </div>
+            <div class="form-row">
+                <label for="layanan">Layanan</label>
+                <select id="layanan" name="layanan" required>
+                    {% for nama_layanan, harga in layanan.items() %}
+                    <option value="{{ nama_layanan }}">{{ nama_layanan }} — Rp{{ "{:,}".format(harga) }}/kg</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-green">Simpan & Buat Nota</button>
+        </form>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <span>{% if keyword %}Hasil Pencarian{% else %}Daftar Pesanan Aktif{% endif %}</span>
+    </div>
+    <div class="panel-body">
+        <form method="GET" action="/admin" class="search-form">
+            <input type="search" name="q" value="{{ keyword }}" placeholder="Cari nama atau nomor WhatsApp">
+            <button type="submit" class="btn">Cari</button>
+            {% if keyword %}
+            <a href="/admin" class="btn">Reset</a>
+            {% endif %}
+        </form>
         {% if orders %}
-        <table class="data">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nama</th>
-                    <th>No HP</th>
-                    <th>Berat</th>
-                    <th>Layanan</th>
-                    <th>Harga</th>
-                    <th>Rak</th>
-                    <th>Status</th>
-                    <th>Bayar</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for o in orders %}
-                <tr>
-                    <td>#{{ o.id }}</td>
-                    <td><strong>{{ o.nama }}</strong></td>
-                    <td>{{ o.no_hp or '-' }}</td>
-                    <td>{{ o.berat }} kg</td>
-                    <td>{{ o.layanan }}</td>
-                    <td>Rp{{ "{:,}".format(o.harga) }}</td>
-                    <td>
+        <div class="order-list">
+            {% for o in orders %}
+            <details class="order-card">
+                <summary>
+                    <span class="order-name">{{ o.nama }}</span>
+                    <span class="badge badge-{{ o.status }}">{{ o.status|capitalize }}</span>
+                    <span class="order-toggle" aria-hidden="true"></span>
+                </summary>
+                <div class="order-details">
+                    <div class="order-field">
+                        <span class="order-field-label">ID</span>
+                        <strong>#{{ o.id }}</strong>
+                    </div>
+                    <div class="order-field">
+                        <span class="order-field-label">No WhatsApp</span>
+                        {{ o.no_hp or '-' }}
+                    </div>
+                    <div class="order-field">
+                        <span class="order-field-label">Berat</span>
+                        {{ o.berat }} kg
+                    </div>
+                    <div class="order-field">
+                        <span class="order-field-label">Layanan</span>
+                        {{ o.layanan }}
+                    </div>
+                    <div class="order-field">
+                        <span class="order-field-label">Harga</span>
+                        Rp{{ "{:,}".format(o.harga) }}
+                    </div>
+                    <div class="order-field">
+                        <span class="order-field-label">Rak</span>
                         {% if o.no_rak %}<span class="badge badge-rak">{{ o.no_rak }}</span>{% else %}-{% endif %}
-                    </td>
-                    <td><span class="badge badge-{{ o.status }}">{{ o.status }}</span></td>
-                    <td>
+                    </div>
+                    <div class="order-field">
+                        <span class="order-field-label">Pembayaran</span>
                         {% if o.sudah_bayar %}
                             <span class="badge badge-lunas">Lunas</span>
                         {% else %}
                             <span class="badge badge-belum">-Rp{{ "{:,}".format(o.harga - o.jumlah_bayar) }}</span>
                         {% endif %}
-                    </td>
-                    <td>
-                        {% if o.status != 'ready' %}
-                        <a href="/admin/status/{{ o.id }}" class="btn btn-small">Maju →</a>
+                    </div>
+                    <div class="order-actions">
+                        {% if o.status == 'diproses' %}
+                        <a href="/admin/status/{{ o.id }}" class="btn btn-small btn-green" onclick="return confirm('Tandai pesanan selesai?')">Selesai ✓</a>
                         {% endif %}
                         <a href="/admin/nota/{{ o.id }}" class="btn btn-small" target="_blank">Nota</a>
-                        {% if o.status == 'ready' %}
-                        <a href="/admin/status/{{ o.id }}" class="btn btn-small btn-green" onclick="return confirm('Konfirmasi pesanan diambil? Rak akan dikosongkan.')">Ambil ✓</a>
-                        {% endif %}
                         {% if not o.sudah_bayar %}
                         <a href="/admin/lunas/{{ o.id }}" class="btn btn-small btn-green" onclick="return confirm('Tandai lunas?')">Lunas</a>
                         {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                    </div>
+                </div>
+            </details>
+            {% endfor %}
+        </div>
         {% else %}
-        <div class="empty">Belum ada pesanan aktif.</div>
+        <div class="empty">{% if keyword %}Tidak ada pesanan yang cocok dengan pencarian tersebut.{% else %}Belum ada pesanan aktif.{% endif %}</div>
         {% endif %}
     </div>
 </div>

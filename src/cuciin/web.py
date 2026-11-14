@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, redirect, session, url_for, f
 from cuciin.database import get_connection, init_db, verify_admin
 from cuciin.models import Order, HARGA, STATUS_FLOW, rak_kosong, semua_rak
 from datetime import datetime, timedelta
+import math
 
 app = Flask(__name__)
 app.secret_key = "cuciin-secret"
@@ -122,20 +123,72 @@ def tambah():
 
 # ============ ADMIN ============
 
-@app.route("/admin")
+@app.route("/admin", methods=["GET", "POST"])
 def admin():
-    conn = get_connection()
-    orders = conn.execute(
-        "SELECT * FROM orders WHERE status != 'diambil' ORDER BY id DESC"
-    ).fetchall()
+    if request.method == "POST":
+        nama = request.form.get("nama", "").strip()
+        no_hp = request.form.get("no_hp", "").strip()
+        layanan = request.form.get("layanan", "")
+        try:
+            berat = float(request.form.get("berat", ""))
+        except ValueError:
+            flash("berat harus berupa angka yang lebih besar dari 0", "error")
+            return redirect(url_for("admin"))
 
-    total_order = conn.execute("SELECT COUNT(*) as c FROM orders WHERE status != 'diambil'").fetchone()["c"]
+        if not nama:
+            flash("nama pelanggan wajib diisi", "error")
+            return redirect(url_for("admin"))
+        if not math.isfinite(berat) or berat <= 0:
+            flash("berat harus lebih besar dari 0", "error")
+            return redirect(url_for("admin"))
+        if layanan not in HARGA:
+            flash("layanan tidak valid", "error")
+            return redirect(url_for("admin"))
+
+        conn = get_connection()
+        rak = rak_kosong(conn)
+        if rak is None:
+            conn.close()
+            flash("rak penuh!", "error")
+            return redirect(url_for("admin"))
+
+        order = Order.buat(nama, no_hp, berat, layanan)
+        order.no_rak = rak
+        cur = conn.execute(
+            """INSERT INTO orders (nama, no_hp, berat, layanan, harga, status, no_rak, sudah_bayar, jumlah_bayar)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (order.nama, order.no_hp, order.berat, order.layanan, order.harga,
+             order.status, order.no_rak, order.sudah_bayar, order.jumlah_bayar),
+        )
+        order_id = cur.lastrowid
+        conn.commit()
+        conn.close()
+        flash(f"order #{order_id} berhasil ditambahkan — status Diproses", "success")
+        return redirect(url_for("admin"))
+
+    keyword = request.args.get("q", "").strip()
+    conn = get_connection()
+    if keyword:
+        orders = conn.execute(
+            """SELECT * FROM orders
+               WHERE nama LIKE ? OR no_hp LIKE ?
+               ORDER BY id DESC""",
+            (f"%{keyword}%", f"%{keyword}%"),
+        ).fetchall()
+    else:
+        orders = conn.execute(
+            "SELECT * FROM orders WHERE NOT (status = 'selesai' AND sudah_bayar = 1) ORDER BY id DESC"
+        ).fetchall()
+
+    total_order = conn.execute(
+        "SELECT COUNT(*) as c FROM orders WHERE NOT (status = 'selesai' AND sudah_bayar = 1)"
+    ).fetchone()["c"]
     total_pendapatan = conn.execute("SELECT COALESCE(SUM(jumlah_bayar), 0) as s FROM orders").fetchone()["s"]
     total_piutang = conn.execute(
         "SELECT COALESCE(SUM(harga - jumlah_bayar), 0) as s FROM orders WHERE sudah_bayar = 0"
     ).fetchone()["s"]
     rak_terpakai = conn.execute(
-        "SELECT COUNT(*) as c FROM orders WHERE status != 'diambil' AND no_rak IS NOT NULL"
+        "SELECT COUNT(*) as c FROM orders WHERE no_rak IS NOT NULL"
     ).fetchone()["c"]
     conn.close()
 
@@ -146,7 +199,9 @@ def admin():
         "rak_terpakai": rak_terpakai,
         "rak_total": len(semua_rak()),
     }
-    return render_template("admin.html", orders=orders, stats=stats)
+    return render_template(
+        "admin.html", orders=orders, stats=stats, layanan=HARGA, keyword=keyword
+    )
 
 
 @app.route("/admin/bayar/<int:order_id>", methods=["POST"])
@@ -207,17 +262,17 @@ def admin_status(order_id):
 
     if idx + 1 >= len(STATUS_FLOW):
         conn.close()
-        flash(f"order #{order_id} udah diambil", "warning")
+        flash(f"order #{order_id} sudah selesai", "warning")
         return redirect(url_for("admin"))
 
     next_stat = STATUS_FLOW[idx + 1]
 
-    if next_stat == "diambil":
+    if next_stat == "selesai":
         conn.execute(
-            "UPDATE orders SET status = ?, diambil_at = CURRENT_TIMESTAMP, no_rak = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+            "UPDATE orders SET status = ?, no_rak = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
             (next_stat, order_id),
         )
-        flash(f"order #{order_id} diambil — rak {row['no_rak']} kosong", "success")
+        flash(f"order #{order_id} selesai — rak {row['no_rak']} kosong", "success")
     else:
         conn.execute(
             "UPDATE orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
@@ -247,7 +302,7 @@ def admin_nota(order_id):
 def admin_rak():
     conn = get_connection()
     rows = conn.execute(
-        "SELECT no_rak, nama, id FROM orders WHERE status != 'diambil' AND no_rak IS NOT NULL"
+        "SELECT no_rak, nama, id FROM orders WHERE status != 'selesai' AND no_rak IS NOT NULL"
     ).fetchall()
     conn.close()
 
@@ -279,7 +334,9 @@ def admin_rekap():
         start = "1970-01-01"
 
     rows = conn.execute(
-        "SELECT * FROM orders WHERE DATE(created_at) >= ? ORDER BY created_at DESC",
+        """SELECT * FROM orders
+           WHERE status = 'selesai' AND sudah_bayar = 1 AND DATE(created_at) >= ?
+           ORDER BY created_at DESC""",
         (start,),
     ).fetchall()
 
@@ -303,7 +360,7 @@ def admin_rekap():
 def admin_arsip():
     conn = get_connection()
     rows = conn.execute(
-        "SELECT * FROM orders WHERE status = 'diambil' ORDER BY diambil_at DESC"
+        "SELECT * FROM orders WHERE status = 'selesai' ORDER BY updated_at DESC"
     ).fetchall()
     conn.close()
     return render_template("arsip.html", orders=rows)
