@@ -10,10 +10,7 @@
         body {
             font-family: Tahoma, Verdana, Arial, sans-serif;
             font-size: 12px;
-            background: #d4d0c8;
-            background-image:
-                linear-gradient(180deg, #e8f4fc 0%, #b8d8ec 40%, #d4d0c8 40%, #d4d0c8 100%);
-            background-attachment: fixed;
+            background: linear-gradient(180deg, #e8f4fc 0%, #b8d8ec 100%);
             min-height: 100vh;
             color: #1a3a5c;
         }
@@ -32,14 +29,24 @@
             align-items: center;
             justify-content: space-between;
         }
-        .logo {
-            font-size: 22px;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 1px 1px 2px #2a5a8a, 0 0 8px #ffffff80;
-            letter-spacing: 1px;
+        .brand-logo {
+            display: block;
+            position: relative;
+            flex: 0 0 64px;
+            width: 64px;
+            height: 64px;
+            overflow: hidden;
+            border-radius: 50%;
+            background: #fdf9f3;
         }
-        .logo span { font-size: 14px; opacity: 0.85; font-weight: normal; }
+        .brand-logo img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 180%;
+            max-width: none;
+            transform: translate(-50%, -50%);
+        }
 
         .nav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
         .nav a {
@@ -414,12 +421,13 @@
 <body>
     <div class="header">
         <div class="header-inner">
-            <div class="logo">cuciin <span>🧺 admin</span></div>
+            <a href="/admin" class="brand-logo" aria-label="Dashboard">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo CUCIIN">
+            </a>
             <div class="nav">
                 <a href="/admin" class="{% if active == 'dashboard' %}active{% endif %}">Dashboard</a>
                 <a href="/admin/rak" class="{% if active == 'rak' %}active{% endif %}">Rak</a>
                 <a href="/admin/rekap" class="{% if active == 'rekap' %}active{% endif %}">Rekap</a>
-                <a href="/admin/arsip" class="{% if active == 'arsip' %}active{% endif %}">Arsip</a>
             </div>
         </div>
     </div>

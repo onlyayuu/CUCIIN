@@ -12,10 +12,11 @@
             <a href="/admin/rekap?periode=minggu" class="btn btn-small {% if rekap.periode == 'minggu' %}active{% endif %}">7 Hari</a>
             <a href="/admin/rekap?periode=bulan"  class="btn btn-small {% if rekap.periode == 'bulan' %}active{% endif %}">30 Hari</a>
             <a href="/admin/rekap?periode=semua"  class="btn btn-small {% if rekap.periode == 'semua' %}active{% endif %}">Semua</a>
+            <a href="/admin/rekap/export?periode={{ rekap.periode }}" class="btn btn-small btn-green">Ekspor CSV</a>
         </div>
     </div>
     <div class="panel-body">
-        <p style="margin-bottom: 12px; color: #4a7fb0;">Hanya pesanan berstatus Selesai dan pembayaran Lunas yang ditampilkan.</p>
+        <p style="margin-bottom: 12px; color: #4a7fb0;">Pesanan selesai dikelompokkan berdasarkan tanggal masuk. Ekspor mengunduh semua transaksi pada periode yang dipilih.</p>
         <div class="stats">
             <div class="stat">
                 <div class="stat-label">Total Order</div>
@@ -43,44 +44,53 @@
     </div>
     <div class="panel-body">
         {% if orders %}
-        <table class="data">
-            <thead>
-                <tr>
-                    <th>Tanggal</th>
-                    <th>ID</th>
-                    <th>Nama</th>
-                    <th>Layanan</th>
-                    <th>Harga</th>
-                    <th>Dibayar</th>
-                    <th>Sisa</th>
-                    <th>Status Bayar</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for o in orders %}
-                <tr>
-                    <td data-label="Tanggal">{{ o.created_at[:16] }}</td>
-                    <td data-label="ID">#{{ o.id }}</td>
-                    <td data-label="Nama">{{ o.nama }}</td>
-                    <td data-label="Layanan">{{ o.layanan }}</td>
-                    <td data-label="Harga">Rp{{ "{:,}".format(o.harga) }}</td>
-                    <td data-label="Dibayar">Rp{{ "{:,}".format(o.jumlah_bayar) }}</td>
-                    <td data-label="Sisa">
+        <div class="order-list">
+            {% for o in orders %}
+            <details class="order-card">
+                <summary>
+                    <span class="order-name">{{ o.nama }}</span>
+                    <span class="badge badge-{{ o.status }}">{{ o.status|capitalize }}</span>
+                    <span class="order-toggle" aria-hidden="true"></span>
+                </summary>
+                <div class="order-details">
+                    <div class="order-field">
+                        <span class="order-field-label">Tanggal</span>
+                        {{ o.created_at[:16] }}
+                    </div>
+                    <div class="order-field">
+                        <span class="order-field-label">ID</span>
+                        <strong>#{{ o.id }}</strong>
+                    </div>
+                    <div class="order-field">
+                        <span class="order-field-label">No WhatsApp</span>
+                        {{ o.no_hp or '-' }}
+                    </div>
+                    <div class="order-field">
+                        <span class="order-field-label">Layanan</span>
+                        {{ o.layanan }}
+                    </div>
+                    <div class="order-field">
+                        <span class="order-field-label">Harga</span>
+                        Rp{{ "{:,}".format(o.harga) }}
+                    </div>
+                    <div class="order-field">
+                        <span class="order-field-label">Dibayar</span>
+                        Rp{{ "{:,}".format(o.jumlah_bayar) }}
+                    </div>
+                    <div class="order-field">
+                        <span class="order-field-label">Sisa</span>
                         {% if o.harga - o.jumlah_bayar > 0 %}
                         <span style="color:#b02a2a;">Rp{{ "{:,}".format(o.harga - o.jumlah_bayar) }}</span>
                         {% else %}-{% endif %}
-                    </td>
-                    <td data-label="Status Bayar">
-                        {% if o.sudah_bayar %}
-                        <span class="badge badge-lunas">Lunas</span>
-                        {% else %}
-                        <span class="badge badge-belum">Belum</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                    </div>
+                    <div class="order-actions">
+                        <a href="/admin/nota/{{ o.id }}" class="btn btn-small" target="_blank">Nota</a>
+                        <a href="/order/{{ o.id }}" class="btn btn-small" target="_blank">Detail Pelanggan</a>
+                    </div>
+                </div>
+            </details>
+            {% endfor %}
+        </div>
         {% else %}
         <div class="empty">Gak ada transaksi di periode ini.</div>
         {% endif %}
